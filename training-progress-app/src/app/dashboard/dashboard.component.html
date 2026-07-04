@@ -1,0 +1,167 @@
+<div class="dashboard">
+  <!-- Navigation bar -->
+  <header class="dash-nav">
+    <div class="dash-nav__inner">
+      <a routerLink="/" class="dash-nav__brand" aria-label="Go to home page">
+        <i class="pi pi-bolt" aria-hidden="true"></i>
+        FitProgress
+      </a>
+      <div class="dash-nav__actions">
+        @if (userName()) {
+          <span class="dash-nav__user">
+            <i class="pi pi-user-circle" aria-hidden="true"></i>
+            {{ userName() }}
+          </span>
+        }
+        <p-button
+          label="Sign Out"
+          icon="pi pi-sign-out"
+          [outlined]="true"
+          size="small"
+          (onClick)="signOut()"
+          ariaLabel="Sign out of FitProgress"
+        />
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="dash-content" id="main-content" tabindex="-1">
+    <!-- Page heading -->
+    <div class="dash-heading">
+      <h1 class="dash-heading__title">
+        @if (userName()) {
+          Welcome back, {{ userName() }}
+        } @else {
+          Dashboard
+        }
+      </h1>
+      <p class="dash-heading__subtitle">Here's your training overview</p>
+    </div>
+
+    <!-- Stat cards row -->
+    <section class="stats-row" aria-label="Training statistics">
+      <!-- Kg lifted last session -->
+      <p-card>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--primary">
+            <i class="pi pi-chart-bar" aria-hidden="true"></i>
+          </div>
+          <div class="stat-card__body">
+            <span class="stat-card__label">Kg Lifted</span>
+            <span class="stat-card__value" aria-live="polite">
+              @if (service.lastSession(); as session) {
+                {{ session.kgLifted | number: '1.0-0' }}<span class="stat-card__unit"> kg</span>
+              } @else {
+                <span class="stat-card__empty">—</span>
+              }
+            </span>
+            <span class="stat-card__meta">Last training session</span>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Km travelled today -->
+      <p-card>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--green">
+            <i class="pi pi-map" aria-hidden="true"></i>
+          </div>
+          <div class="stat-card__body">
+            <span class="stat-card__label">Km Travelled</span>
+            <span class="stat-card__value" aria-live="polite">
+              {{ service.todayKmTravelled() | number: '1.1-1' }}<span class="stat-card__unit"> km</span>
+            </span>
+            <span class="stat-card__meta">Today</span>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Calories burned last session -->
+      <p-card>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--orange">
+            <i class="pi pi-bolt" aria-hidden="true"></i>
+          </div>
+          <div class="stat-card__body">
+            <span class="stat-card__label">Calories Burned</span>
+            <span class="stat-card__value" aria-live="polite">
+              @if (service.lastSession(); as session) {
+                {{ session.caloriesBurned | number: '1.0-0' }}<span class="stat-card__unit"> kcal</span>
+              } @else {
+                <span class="stat-card__empty">—</span>
+              }
+            </span>
+            <span class="stat-card__meta">Last training session</span>
+          </div>
+        </div>
+      </p-card>
+    </section>
+
+    <!-- Calendar + Chart grid -->
+    <div class="dash-bottom-grid">
+      <!-- Training days calendar -->
+      <p-card>
+        <div class="calendar-card">
+          <div class="card-section-header">
+            <i class="pi pi-calendar" aria-hidden="true"></i>
+            <span>Training Calendar</span>
+          </div>
+          <p-datepicker
+            [inline]="true"
+            [readonlyInput]="true"
+            [maxDate]="today"
+            ariaLabel="Training days calendar"
+          >
+            <ng-template pTemplate="date" let-date>
+              <span
+                [class.training-day]="isTrainingDay(date)"
+                [attr.aria-label]="isTrainingDay(date) ? date.day + ' — training day' : null"
+              >{{ date.day }}</span>
+            </ng-template>
+          </p-datepicker>
+          <div class="calendar-legend" aria-label="Calendar legend">
+            <span class="calendar-legend__dot" aria-hidden="true"></span>
+            <span>Training day</span>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Body mass chart -->
+      <p-card>
+        <div class="chart-card">
+          <div class="card-section-header card-section-header--between">
+            <div class="card-section-header__title">
+              <i class="pi pi-chart-line" aria-hidden="true"></i>
+              <span>Body Mass</span>
+            </div>
+            <div
+              class="period-selector"
+              role="group"
+              aria-label="Select chart time period"
+            >
+              @for (opt of periodOptions; track opt.months) {
+                <p-button
+                  [label]="opt.label"
+                  [outlined]="service.bodyMassPeriod() !== opt.months"
+                  size="small"
+                  (onClick)="service.selectBodyMassPeriod(opt.months)"
+                  [attr.aria-pressed]="service.bodyMassPeriod() === opt.months"
+                />
+              }
+            </div>
+          </div>
+          <div class="chart-wrap" aria-label="Body mass chart">
+            <p-chart
+              type="line"
+              [data]="service.bodyMassChartData()"
+              [options]="chartOptions"
+              ariaLabel="Body mass over time"
+            />
+          </div>
+          <p class="chart-caption">Body mass in kg over the selected period</p>
+        </div>
+      </p-card>
+    </div>
+  </main>
+</div>

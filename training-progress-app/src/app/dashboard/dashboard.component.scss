@@ -1,0 +1,311 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background: var(--p-surface-950);
+}
+
+// ── Navigation ──────────────────────────────────────────────────────────────
+
+.dash-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--p-surface-900);
+  border-bottom: 1px solid var(--p-surface-700);
+}
+
+.dash-nav__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0.875rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dash-nav__brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--p-primary-color);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  .pi {
+    font-size: 1rem;
+  }
+}
+
+.dash-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dash-nav__user {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
+
+  .pi {
+    font-size: 1rem;
+  }
+}
+
+// ── Page content ─────────────────────────────────────────────────────────────
+
+.dash-content {
+  flex: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// ── Page heading ─────────────────────────────────────────────────────────────
+
+.dash-heading {
+  margin-bottom: 0.25rem;
+}
+
+.dash-heading__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--p-text-color);
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.dash-heading__subtitle {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--p-text-muted-color);
+}
+
+// ── Stat cards ───────────────────────────────────────────────────────────────
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.stat-card__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--p-surface-700);
+
+  .pi {
+    font-size: 1.25rem;
+    color: var(--p-text-muted-color);
+  }
+
+  &--primary {
+    background: rgba(99, 102, 241, 0.15);
+
+    .pi {
+      color: #6366f1;
+    }
+  }
+
+  &--green {
+    background: rgba(34, 197, 94, 0.12);
+
+    .pi {
+      color: #22c55e;
+    }
+  }
+
+  &--orange {
+    background: rgba(249, 115, 22, 0.12);
+
+    .pi {
+      color: #f97316;
+    }
+  }
+}
+
+.stat-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.stat-card__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--p-text-muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-card__value {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--p-text-color);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.stat-card__unit {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--p-text-muted-color);
+}
+
+.stat-card__empty {
+  color: var(--p-text-muted-color);
+}
+
+.stat-card__meta {
+  font-size: 0.75rem;
+  color: var(--p-text-muted-color);
+}
+
+// ── Bottom grid (calendar + chart) ───────────────────────────────────────────
+
+.dash-bottom-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Card section header ───────────────────────────────────────────────────────
+
+.card-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--p-text-color);
+  margin-bottom: 1.25rem;
+
+  .pi {
+    color: var(--p-primary-color);
+    font-size: 1rem;
+  }
+
+  &--between {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+}
+
+.card-section-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+// ── Training calendar ─────────────────────────────────────────────────────────
+
+.calendar-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Highlight training days in the inline datepicker
+.training-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background-color: var(--p-primary-color);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  color: var(--p-text-muted-color);
+}
+
+.calendar-legend__dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: var(--p-primary-color);
+  flex-shrink: 0;
+}
+
+// ── Period selector ───────────────────────────────────────────────────────────
+
+.period-selector {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+// ── Body mass chart ───────────────────────────────────────────────────────────
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-wrap {
+  height: 300px;
+  position: relative;
+}
+
+.chart-caption {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  color: var(--p-text-muted-color);
+  text-align: center;
+}

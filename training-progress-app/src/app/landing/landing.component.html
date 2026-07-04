@@ -1,0 +1,139 @@
+<header class="nav">
+  <div class="nav-container">
+    <span class="brand">
+      <i class="pi pi-bolt" aria-hidden="true"></i>
+      FitProgress
+    </span>
+    <nav class="nav-actions" aria-label="Primary navigation">
+      @if (clerk.isSignedIn()) {
+        <div class="user-info">
+          <i class="pi pi-user-circle" aria-hidden="true"></i>
+          <span class="user-name">{{ userName() }}</span>
+        </div>
+        <p-button label="Dashboard" icon="pi pi-th-large" routerLink="/dashboard" />
+        <p-button label="Sign Out" icon="pi pi-sign-out" [outlined]="true" (onClick)="signOut()" />
+      } @else {
+        <p-button label="Sign In" [outlined]="true" (onClick)="openSignIn()" />
+        <p-button label="Sign Up Free" icon="pi pi-arrow-right" iconPos="right" (onClick)="openSignUp()" />
+      }
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-decoration" aria-hidden="true">
+      <i class="pi pi-chart-line deco-icon deco-1"></i>
+      <i class="pi pi-trophy deco-icon deco-2"></i>
+      <i class="pi pi-bolt deco-icon deco-3"></i>
+      <i class="pi pi-chart-bar deco-icon deco-4"></i>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="pi pi-bolt" aria-hidden="true"></i>
+        <span>100% Free, Forever</span>
+      </div>
+      <h1 id="hero-heading">
+        Track Your Training.<br />
+        Own Your Progress.
+      </h1>
+      <p class="hero-subtitle">
+        Log every set and rep, visualise your gains over time, and take full control of your
+        fitness journey — completely free.
+      </p>
+      <p-button
+        label="Get Started for Free"
+        size="large"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        (onClick)="goToApp()"
+        ariaLabel="Get started with FitProgress"
+      />
+      <div class="hero-stats" aria-label="Platform highlights">
+        <div class="stat-item">
+          <i class="pi pi-users" aria-hidden="true"></i>
+          <span>Growing Community</span>
+        </div>
+        <div class="stat-item">
+          <i class="pi pi-shield" aria-hidden="true"></i>
+          <span>Secure &amp; Private</span>
+        </div>
+        <div class="stat-item">
+          <i class="pi pi-heart" aria-hidden="true"></i>
+          <span>Always Free</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features" aria-labelledby="features-heading">
+    <div class="section-container">
+      <h2 id="features-heading">Everything You Need to Progress</h2>
+      <div class="features-grid">
+        <p-card>
+          <div class="feature-card-body">
+            <div class="feature-icon-wrap">
+              <i class="pi pi-list feature-icon" aria-hidden="true"></i>
+            </div>
+            <h3>Log Workouts</h3>
+            <p>Record exercises, sets, and reps from every training session with ease.</p>
+          </div>
+        </p-card>
+        <p-card>
+          <div class="feature-card-body">
+            <div class="feature-icon-wrap">
+              <i class="pi pi-chart-line feature-icon" aria-hidden="true"></i>
+            </div>
+            <h3>Track Progress</h3>
+            <p>Visualise your improvements over time and celebrate every personal best.</p>
+          </div>
+        </p-card>
+        <p-card>
+          <div class="feature-card-body">
+            <div class="feature-icon-wrap">
+              <i class="pi pi-trophy feature-icon" aria-hidden="true"></i>
+            </div>
+            <h3>Hit Your Goals</h3>
+            <p>Set personal records, track milestones, and celebrate every achievement.</p>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission -->
+  <section class="mission" aria-labelledby="mission-heading">
+    <div class="mission-container">
+      <h2 id="mission-heading">Our Mission</h2>
+      <p>
+        At FitProgress, we believe that tracking your progress shouldn't cost a thing. Every
+        athlete — whether you're picking up your first barbell or chasing a personal record —
+        deserves the tools to measure and celebrate their growth. FitProgress is free today,
+        free tomorrow, and free forever.
+      </p>
+    </div>
+  </section>
+
+  <!-- Call to action -->
+  <section class="cta" aria-labelledby="cta-heading">
+    <div class="section-container cta-content">
+      <h2 id="cta-heading">Start Your Journey Today</h2>
+      <p>Join FitProgress and take the first step towards owning your progress.</p>
+      <p-button
+        label="Create a Free Account"
+        size="large"
+        icon="pi pi-user-plus"
+        (onClick)="goToApp()"
+        ariaLabel="Create a free FitProgress account"
+      />
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="section-container">
+    <span>&copy; {{ currentYear }} FitProgress. Free for everyone, forever.</span>
+  </div>
+</footer>

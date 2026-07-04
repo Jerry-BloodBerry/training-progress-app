@@ -1,0 +1,20 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# User secrets and env files
+.env
+*.user
+*.suo
+
+# Rider / VS / VSCode
+.vs/
+.idea/
+*.DotSettings.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg

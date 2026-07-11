@@ -1,5 +1,9 @@
 using Core.Persistence;
 using Core.Shared.Events;
+using Core.Trainings.Application;
+using Core.Trainings.Domain;
+using Core.Trainings.Domain.Events;
+using Core.Trainings.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +20,10 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("Default")));
 
         services.AddScoped<IEventBus, InMemoryEventBus>();
+
+        services.AddScoped<ITrainingRepository, TrainingRepository>();
+        services.AddScoped<IEventHandler<TrainingCreatedEvent>, TrainingStatisticsHandler>();
+        services.AddScoped<IEventHandler<TrainingUpdatedEvent>, TrainingStatisticsHandler>();
 
         return services;
     }

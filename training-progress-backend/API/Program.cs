@@ -6,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCoreServices(builder.Configuration);
 builder.Services.AddFastEndpoints();
+builder.Services.AddAuthentication(); // Authentication scheme configured per environment (e.g. Clerk JWT)
+builder.Services.AddAuthorization();
 builder.Services.SwaggerDocument(o =>
 {
     o.DocumentSettings = s =>
@@ -17,6 +19,8 @@ builder.Services.SwaggerDocument(o =>
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseFastEndpoints();
 app.UseSwaggerGen();
 

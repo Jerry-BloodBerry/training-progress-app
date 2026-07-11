@@ -14,18 +14,12 @@ public sealed class GetTrainingEndpoint : Endpoint<GetTrainingRequest, TrainingR
     public override void Configure()
     {
         Get("/trainings/{id}");
-        // TODO: Remove AllowAnonymous and configure Clerk JWT bearer authentication
-        AllowAnonymous();
+        Claims(ClaimTypes.NameIdentifier);
     }
 
     public override async Task HandleAsync(GetTrainingRequest req, CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            await SendUnauthorizedAsync(ct);
-            return;
-        }
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var training = await _repository.GetByIdAsync(req.Id, userId, ct);
         if (training is null)

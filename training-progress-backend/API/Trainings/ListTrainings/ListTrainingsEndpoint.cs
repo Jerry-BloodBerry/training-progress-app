@@ -20,18 +20,12 @@ public sealed class ListTrainingsEndpoint : Endpoint<ListTrainingsRequest, ListT
     public override void Configure()
     {
         Get("/trainings");
-        // TODO: Remove AllowAnonymous and configure Clerk JWT bearer authentication
-        AllowAnonymous();
+        Claims(ClaimTypes.NameIdentifier);
     }
 
     public override async Task HandleAsync(ListTrainingsRequest req, CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            await SendUnauthorizedAsync(ct);
-            return;
-        }
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var page = req.Page < 1 ? 1 : req.Page;
         var pageSize = req.PageSize is < 1 or > 100 ? 20 : req.PageSize;

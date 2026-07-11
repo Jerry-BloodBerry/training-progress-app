@@ -20,18 +20,12 @@ public sealed class DeleteTrainingEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Delete("/trainings/{id}");
-        // TODO: Remove AllowAnonymous and configure Clerk JWT bearer authentication
-        AllowAnonymous();
+        Claims(ClaimTypes.NameIdentifier);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            await SendUnauthorizedAsync(ct);
-            return;
-        }
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var id = Route<Guid>("id");
 

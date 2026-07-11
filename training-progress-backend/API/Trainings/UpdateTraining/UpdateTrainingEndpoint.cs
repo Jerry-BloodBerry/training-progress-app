@@ -21,18 +21,12 @@ public sealed class UpdateTrainingEndpoint : Endpoint<UpdateTrainingRequest, Tra
     public override void Configure()
     {
         Put("/trainings/{id}");
-        // TODO: Remove AllowAnonymous and configure Clerk JWT bearer authentication
-        AllowAnonymous();
+        Claims(ClaimTypes.NameIdentifier);
     }
 
     public override async Task HandleAsync(UpdateTrainingRequest req, CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-        {
-            await SendUnauthorizedAsync(ct);
-            return;
-        }
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         if (req.DurationMinutes <= 0)
             AddError(r => r.DurationMinutes, "Duration must be positive.");

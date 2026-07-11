@@ -3,9 +3,14 @@
 ## Summary
 
 This document governs all UI-related decisions in the training-progress-app Angular project.
-It defines how components, styling, theming, and data visualisation must be implemented.
-All agents performing tasks that touch templates, components, styles, or charts must read and
-follow these rules before making any changes.
+It defines how components, styling, theming, data visualisation, and user experience must be
+implemented. All agents performing tasks that touch templates, components, styles, charts,
+forms, or interaction flows must read and follow these rules before making any changes.
+
+Beyond visual consistency, this document establishes the UX philosophy for the application:
+an **inductive, minimal-complexity** design where the interface guides users forward rather
+than demanding they figure things out themselves. Every screen must feel modern, purposeful,
+and effortless.
 
 ---
 
@@ -17,6 +22,82 @@ PrimeNG should be introduced. Custom components must only be created when PrimeN
 already offer an equivalent. All styling is written in **SCSS** — plain CSS files are not
 permitted. The visual language prioritises simplicity and clarity: minimal chrome, generous
 whitespace, and consistent use of PrimeNG's design-token system for colours and spacing.
+
+The interaction model is **inductive**: the UI shows users what they can do next, pre-fills
+what it already knows, and only asks for information that is genuinely required. Complexity
+is actively minimised at every layer — fewer fields, fewer decisions, fewer clicks.
+
+---
+
+## UX Philosophy & Interaction Design
+
+### Inductive over deductive
+
+An **inductive UI** shows users what they can do and leads them through the flow. A
+**deductive UI** presents raw data or blank forms and expects users to work out what to do.
+Always design inductively:
+
+| Inductive (correct) | Deductive (avoid) |
+|---|---|
+| Pre-select the most likely option | Leave selects blank with no default |
+| Show a guided empty state with a call to action | Show an empty list with no explanation |
+| Surface smart defaults based on prior entries | Show a blank form for every new entry |
+| Provide inline contextual hints | Rely on documentation or tooltips as the only guide |
+| Progressively disclose advanced options | Show all options at once |
+
+### Minimise required input
+
+- Only ask for information that cannot be reasonably inferred or defaulted.
+- Apply sensible defaults wherever possible (e.g., today's date for a training log entry,
+  the user's most recently used exercise type, a standard duration).
+- Combine related fields when they can be captured together (e.g., a date-time picker
+  instead of separate date and time inputs).
+- Never ask the user to confirm information the system already has.
+
+### Progressive disclosure
+
+- Present only the most essential information and controls on first view.
+- Group secondary and advanced options behind an expandable panel, a step in a wizard,
+  or a separate details screen.
+- Use PrimeNG's `p-accordion`, `p-stepper`, or a contextual side panel for secondary detail.
+
+```html
+<!-- CORRECT — show core fields first, advanced behind accordion -->
+<p-accordion>
+  <p-accordion-panel header="Advanced options">
+    <!-- rarely-needed fields here -->
+  </p-accordion-panel>
+</p-accordion>
+
+<!-- WRONG — all fields in a flat form regardless of frequency of use -->
+<form> <!-- 15 fields, all visible at once --> </form>
+```
+
+### Empty states
+
+Every list, table, or chart must have a meaningful empty state that:
+1. Explains why there is no data.
+2. Tells the user what to do next.
+3. Includes a clear call-to-action where appropriate.
+
+```html
+<!-- CORRECT -->
+<div class="empty-state" *ngIf="sessions.length === 0">
+  <p>No training sessions yet.</p>
+  <p-button label="Log your first session" (onClick)="openNewSession()" />
+</div>
+
+<!-- WRONG -->
+<p *ngIf="sessions.length === 0">No data.</p>
+```
+
+### Feedback & system status
+
+- Always acknowledge user actions: show a `p-toast` confirmation after a save, update, or
+  delete operation.
+- Show loading indicators (`p-skeleton` or `p-progressbar`) while data is being fetched —
+  never leave the user looking at a blank area.
+- Inline validation errors must appear immediately on blur, not only on form submit.
 
 ---
 
@@ -298,6 +379,80 @@ padding: 13px 17px;
 - PrimeNG's `p-fluid` class and responsive grid helpers are preferred.
 - Minimum supported viewport: 360 px wide.
 
+### Visual polish
+
+The UI must feel modern and polished without being cluttered:
+
+- Use subtle depth via `var(--p-surface-800)` / `var(--p-surface-900)` layering to
+  distinguish cards and panels from the page background.
+- Apply `border-radius` consistently using `var(--p-border-radius-md)` or
+  `var(--p-border-radius-lg)` — avoid sharp right-angle containers.
+- Prefer `p-card` with a visible but understated border (`var(--p-surface-700)`) over
+  borderless flat containers.
+- Use `var(--p-primary-color)` as an accent for interactive and highlighted elements;
+  never apply it to large background areas.
+
+---
+
+## Animations
+
+Animations are welcome but must be purposeful, brief, and non-distracting.
+
+### Principles
+
+- **Purposeful**: animations must communicate state change (entry, exit, transition, loading),
+  not decorate static content.
+- **Brief**: durations of 150–300 ms for micro-interactions; 300–500 ms for page-level
+  transitions. Never exceed 600 ms.
+- **Subtle**: prefer ease-out or ease-in-out easing; avoid bouncy or spring effects.
+- **Skippable**: all animations must respect `prefers-reduced-motion`.
+
+### Use Angular animations for component state changes
+
+```typescript
+import { trigger, transition, style, animate } from '@angular/animations';
+
+@Component({
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(8px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+    ]),
+  ],
+})
+```
+
+```html
+<!-- Apply to content that loads asynchronously -->
+<div @fadeIn *ngIf="data"> ... </div>
+```
+
+### Reduced-motion support
+
+Always wrap non-trivial animations in a media query guard in SCSS:
+
+```scss
+.card-enter {
+  animation: slideUp 250ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+```
+
+### What to animate
+
+| Appropriate | Inappropriate |
+|---|---|
+| Route / view transitions (fade or slide) | Looping decorative animations |
+| List item entry on first load | Hover wiggles or attention-seeking effects |
+| Modal / dialog open and close | Animating every button press |
+| Toast notification slide-in | Background particle effects |
+| Skeleton shimmer while loading | Continuous spin on static icons |
+
 ---
 
 ## Accessibility
@@ -394,6 +549,18 @@ chartOptions: ChartOptions<'bar'> = {
   needed.
 - **DO** use `definePreset` + `@primeuix/themes` to extend or customise the theme rather
   than overriding styles with `::ng-deep`.
+- **DO** design inductively: guide the user forward, pre-fill what is known, default to the
+  most likely value.
+- **DO** minimise required input — only ask for information that cannot be inferred.
+- **DO** apply progressive disclosure: show essential fields first, hide advanced options
+  behind an accordion or step.
+- **DO** provide meaningful empty states with a clear call-to-action.
+- **DO** acknowledge every user action with a `p-toast` or inline confirmation.
+- **DO** show `p-skeleton` or a loading indicator while data is being fetched.
+- **DO** use purposeful, brief animations (150–300 ms) for state transitions and content entry.
+- **DO** respect `prefers-reduced-motion` in all animation code.
+- **DO** use rounded corners (`var(--p-border-radius-md/lg)`) and subtle surface layering
+  for a polished, modern appearance.
 
 ### DON'T
 
@@ -404,6 +571,14 @@ chartOptions: ChartOptions<'bar'> = {
 - **DON'T** implement a light-mode theme or a dark-mode toggle.
 - **DON'T** use `::ng-deep` for theme-level overrides; use design tokens or `[dt]` instead.
 - **DON'T** add any UI library other than PrimeNG without explicit user approval.
-- **DON'T** add unnecessary animations, gradients, or decorative imagery.
+- **DON'T** add looping, decorative, or attention-seeking animations.
+- **DON'T** animate more than two elements simultaneously on screen.
 - **DON'T** disable keyboard navigation or remove focus rings from PrimeNG components.
 - **DON'T** use `any` for chart data or options types.
+- **DON'T** design deductively: never leave users with a blank form or empty screen and no
+  guidance on what to do.
+- **DON'T** ask the user for information the system already has or can reasonably infer.
+- **DON'T** show all form fields at once when progressive disclosure would reduce cognitive
+  load.
+- **DON'T** leave lists, tables, or charts without a handled empty state.
+- **DON'T** use sharp right-angle containers — always apply a consistent border-radius.

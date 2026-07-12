@@ -106,8 +106,9 @@
                 <div class="step-body">
                   <div class="exercises-builder" formArrayName="exercises">
                     @for (exercise of exercises.controls; track $index; let ei = $index) {
-                      <div class="exercise-card" [formGroupName]="ei">
+                      <div class="exercise-card" [formGroupName]="ei" @fadeUp>
                         <div class="exercise-card__header">
+                          <span class="exercise-ordinal" aria-hidden="true">{{ ei + 1 }}</span>
                           <div class="exercise-name-field">
                             <label [for]="'exercise-name-' + ei" class="sr-only">
                               Exercise name
@@ -147,11 +148,13 @@
                         <!-- Sets -->
                         <div class="sets-builder" formArrayName="sets">
                           @for (set of setsFor(ei).controls; track $index; let si = $index) {
-                            <div class="set-row" [formGroupName]="si">
+                            <div class="set-row" [formGroupName]="si" @fadeUp>
                               <span class="set-number" aria-hidden="true">{{ si + 1 }}</span>
                               <div class="set-fields">
                                 <div class="set-field">
-                                  <label [for]="'reps-' + ei + '-' + si" class="set-label">Reps</label>
+                                  <label [for]="'reps-' + ei + '-' + si" class="set-label">
+                                    <i class="pi pi-refresh" aria-hidden="true"></i> Reps
+                                  </label>
                                   <p-inputnumber
                                     [inputId]="'reps-' + ei + '-' + si"
                                     formControlName="reps"
@@ -162,7 +165,9 @@
                                   />
                                 </div>
                                 <div class="set-field">
-                                  <label [for]="'weight-' + ei + '-' + si" class="set-label">Weight (kg)</label>
+                                  <label [for]="'weight-' + ei + '-' + si" class="set-label">
+                                    <i class="pi pi-dumbbell" aria-hidden="true"></i> kg
+                                  </label>
                                   <p-inputnumber
                                     [inputId]="'weight-' + ei + '-' + si"
                                     formControlName="weightKg"
@@ -174,7 +179,9 @@
                                   />
                                 </div>
                                 <div class="set-field">
-                                  <label [for]="'duration-' + ei + '-' + si" class="set-label">Duration (s)</label>
+                                  <label [for]="'duration-' + ei + '-' + si" class="set-label">
+                                    <i class="pi pi-clock" aria-hidden="true"></i> Secs
+                                  </label>
                                   <p-inputnumber
                                     [inputId]="'duration-' + ei + '-' + si"
                                     formControlName="durationSeconds"
@@ -186,7 +193,7 @@
                                 </div>
                                 <div class="set-field set-field--notes">
                                   <label [for]="'set-notes-' + ei + '-' + si" class="set-label">
-                                    Notes
+                                    <i class="pi pi-align-left" aria-hidden="true"></i> Notes
                                   </label>
                                   <input
                                     pInputText
@@ -212,21 +219,26 @@
                           }
                         </div>
 
-                        <p-button
-                          label="Add Set"
-                          icon="pi pi-plus"
-                          [text]="true"
-                          size="small"
-                          type="button"
-                          (onClick)="addSet(ei)"
-                          styleClass="add-set-btn"
-                        />
+                        <div class="exercise-card__footer">
+                          <p class="exercise-summary" aria-live="polite">
+                            {{ exerciseSummary(ei) }}
+                          </p>
+                          <p-button
+                            label="Add Set"
+                            icon="pi pi-plus"
+                            [text]="true"
+                            size="small"
+                            type="button"
+                            (onClick)="addSet(ei)"
+                            styleClass="add-set-btn"
+                          />
+                        </div>
                       </div>
                     }
 
                     <p-button
                       label="Add Exercise"
-                      icon="pi pi-plus"
+                      icon="pi pi-dumbbell"
                       [outlined]="true"
                       type="button"
                       (onClick)="addExercise()"

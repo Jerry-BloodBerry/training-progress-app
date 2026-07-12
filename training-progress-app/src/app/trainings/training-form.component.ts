@@ -8,6 +8,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -57,6 +58,14 @@ export interface TrainingFormValue {
   templateUrl: './training-form.component.html',
   styleUrl: './training-form.component.scss',
   providers: [MessageService],
+  animations: [
+    trigger('fadeUp', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-8px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+    ]),
+  ],
 })
 export class TrainingFormComponent {
   private readonly fb = inject(FormBuilder);
@@ -164,7 +173,17 @@ export class TrainingFormComponent {
   }
 
   protected addSet(exerciseIndex: number): void {
-    this.setsFor(exerciseIndex).push(this.createSetGroup());
+    const setsArr = this.setsFor(exerciseIndex);
+    const last = setsArr.length > 0 ? setsArr.at(setsArr.length - 1) : null;
+    // Pre-fill numeric fields from the previous set; skip notes (they are set-specific)
+    const prefill: Partial<SetFormValue> | undefined = last
+      ? {
+          reps: last.get('reps')?.value as number | null,
+          weightKg: last.get('weightKg')?.value as number | null,
+          durationSeconds: last.get('durationSeconds')?.value as number | null,
+        }
+      : undefined;
+    setsArr.push(this.createSetGroup(prefill));
   }
 
   protected removeSet(exerciseIndex: number, setIndex: number): void {
@@ -177,6 +196,30 @@ export class TrainingFormComponent {
     this.filteredExercises.set(
       query ? known.filter((name) => name.toLowerCase().includes(query)) : known,
     );
+  }
+
+  protected exerciseSummary(exerciseIndex: number): string {
+    const setsArr = this.setsFor(exerciseIndex);
+    const count = setsArr.length;
+    let totalReps = 0;
+    const weights: number[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const set = setsArr.at(i);
+      const reps = set.get('reps')?.value as number | null;
+      const weightKg = set.get('weightKg')?.value as number | null;
+      if (reps != null && reps > 0) totalReps += reps;
+      if (weightKg != null && weightKg > 0) weights.push(weightKg);
+    }
+
+    const summaryParts: string[] = [`${count} set${count !== 1 ? 's' : ''}`];
+    if (totalReps > 0) summaryParts.push(`${totalReps} reps`);
+    if (weights.length > 0) {
+      const min = Math.min(...weights);
+      const max = Math.max(...weights);
+      summaryParts.push(min === max ? `${min} kg` : `${min}–${max} kg`);
+    }
+    return summaryParts.join(' · ');
   }
 
   protected getControl(group: AbstractControl, name: string): AbstractControl {

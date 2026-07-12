@@ -1,0 +1,95 @@
+<div class="trainings-page">
+  <p-toast />
+  <p-confirmdialog />
+
+  <header class="page-header">
+    <div class="page-header__inner">
+      <div class="page-header__title-group">
+        <a routerLink="/dashboard" class="page-header__back" aria-label="Back to dashboard">
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        </a>
+        <h1 class="page-header__title">My Trainings</h1>
+      </div>
+      <p-button
+        label="New Training"
+        icon="pi pi-plus"
+        (onClick)="navigateToNew()"
+        ariaLabel="Create new training"
+      />
+    </div>
+  </header>
+
+  <main class="page-content" id="main-content" tabindex="-1">
+    @if (loading()) {
+      <div class="skeleton-list" aria-busy="true" aria-label="Loading trainings">
+        @for (_ of [1, 2, 3, 4, 5]; track $index) {
+          <p-skeleton height="3.5rem" styleClass="skeleton-row" />
+        }
+      </div>
+    } @else if (trainings().length === 0) {
+      <div class="empty-state" role="region" aria-label="No trainings yet">
+        <i class="pi pi-dumbbell empty-state__icon" aria-hidden="true"></i>
+        <p class="empty-state__message">No training sessions yet.</p>
+        <p class="empty-state__hint">Start logging your workouts to track progress over time.</p>
+        <p-button label="Log your first training" icon="pi pi-plus" (onClick)="navigateToNew()" />
+      </div>
+    } @else {
+      <p-table
+        [value]="trainings()"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalCount()"
+        (onPage)="onPageChange($event)"
+        [rowHover]="true"
+        styleClass="trainings-table"
+        aria-label="Training sessions"
+      >
+        <ng-template #header>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Exercises</th>
+            <th scope="col">Volume</th>
+            <th scope="col">Notes</th>
+            <th scope="col" class="col-actions">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-training>
+          <tr>
+            <td>
+              <a [routerLink]="['/trainings', training.id]" class="training-date-link">
+                {{ training.date | date: 'mediumDate' }}
+              </a>
+            </td>
+            <td>{{ training.durationMinutes }} min</td>
+            <td>{{ training.exercises.length }}</td>
+            <td>{{ training.statistics.totalVolumeKg | number: '1.0-1' }} kg</td>
+            <td class="col-notes">{{ training.notes || '—' }}</td>
+            <td class="col-actions">
+              <div class="row-actions">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [outlined]="true"
+                  size="small"
+                  [routerLink]="['/trainings', training.id, 'edit']"
+                  ariaLabel="Edit training on {{ training.date | date: 'mediumDate' }}"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [outlined]="true"
+                  severity="danger"
+                  size="small"
+                  (onClick)="onDelete(training)"
+                  ariaLabel="Delete training on {{ training.date | date: 'mediumDate' }}"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </main>
+</div>

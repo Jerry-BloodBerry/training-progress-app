@@ -1,0 +1,238 @@
+.form-page {
+  min-height: 100vh;
+  background-color: var(--p-surface-900);
+  color: var(--p-surface-0);
+}
+
+.page-header {
+  background-color: var(--p-surface-800);
+  border-bottom: 1px solid var(--p-surface-700);
+  padding: 1rem 1.5rem;
+
+  &__inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__back {
+    color: var(--p-surface-400);
+    font-size: 1.125rem;
+    text-decoration: none;
+    transition: color 0.15s;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--p-primary-400);
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.page-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 4rem;
+  color: var(--p-surface-400);
+  font-size: 1rem;
+
+  i {
+    font-size: 1.5rem;
+  }
+}
+
+.step-body {
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--p-surface-200);
+}
+
+.required {
+  color: var(--p-red-400);
+}
+
+.form-error {
+  color: var(--p-red-400);
+  font-size: 0.8rem;
+}
+
+.step-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--p-surface-700);
+
+  &--split {
+    justify-content: space-between;
+  }
+}
+
+/* ── Exercises builder ── */
+
+.exercises-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.exercise-card {
+  background-color: var(--p-surface-800);
+  border: 1px solid var(--p-surface-700);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+.exercise-name-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.exercise-autocomplete {
+  width: 100%;
+}
+
+/* ── Sets ── */
+
+.sets-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.set-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: var(--p-surface-850, var(--p-surface-900));
+  border-radius: 0.5rem;
+}
+
+.set-number {
+  width: 1.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--p-surface-400);
+  padding-bottom: 0.375rem;
+  flex-shrink: 0;
+}
+
+.set-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.set-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  &--notes {
+    flex: 1;
+    min-width: 120px;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+.set-label {
+  font-size: 0.75rem;
+  color: var(--p-surface-400);
+}
+
+.add-set-btn {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+}
+
+.add-exercise-btn {
+  width: 100%;
+}
+
+/* Screen-reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Width utility */
+.w-full {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .set-fields {
+    flex-direction: column;
+  }
+}

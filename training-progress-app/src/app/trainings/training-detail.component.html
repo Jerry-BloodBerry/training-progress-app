@@ -1,0 +1,155 @@
+<div class="detail-page">
+  <p-toast />
+  <p-confirmdialog />
+
+  <header class="page-header">
+    <div class="page-header__inner">
+      <div class="page-header__title-group">
+        <a routerLink="/trainings" class="page-header__back" aria-label="Back to trainings list">
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        </a>
+        <h1 class="page-header__title">
+          @if (training(); as t) {
+            {{ t.date | date: 'fullDate' }}
+          } @else {
+            Training Detail
+          }
+        </h1>
+      </div>
+
+      @if (training(); as t) {
+        <div class="page-header__actions">
+          <p-button
+            label="Edit"
+            icon="pi pi-pencil"
+            [outlined]="true"
+            [routerLink]="['/trainings', t.id, 'edit']"
+            ariaLabel="Edit this training"
+          />
+          <p-button
+            label="Delete"
+            icon="pi pi-trash"
+            severity="danger"
+            [outlined]="true"
+            (onClick)="onDelete()"
+            ariaLabel="Delete this training"
+          />
+        </div>
+      }
+    </div>
+  </header>
+
+  <main class="page-content" id="main-content" tabindex="-1">
+    @if (loading()) {
+      <div class="skeleton-layout" aria-busy="true" aria-label="Loading training">
+        <p-skeleton height="6rem" />
+        <p-skeleton height="12rem" styleClass="mt-4" />
+      </div>
+    } @else if (notFound()) {
+      <div class="not-found" role="alert">
+        <i class="pi pi-exclamation-triangle not-found__icon" aria-hidden="true"></i>
+        <p class="not-found__message">Training not found.</p>
+        <p-button label="Back to Trainings" routerLink="/trainings" />
+      </div>
+    } @else if (training(); as t) {
+      <!-- Summary stats -->
+      <section class="stats-row" aria-label="Training statistics">
+        <p-card>
+          <div class="stat-card">
+            <i class="pi pi-clock stat-card__icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-card__value">{{ formatDuration(t.durationMinutes) }}</div>
+              <div class="stat-card__label">Duration</div>
+            </div>
+          </div>
+        </p-card>
+        <p-card>
+          <div class="stat-card">
+            <i class="pi pi-chart-bar stat-card__icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-card__value">{{ t.statistics.totalVolumeKg | number: '1.0-1' }} kg</div>
+              <div class="stat-card__label">Total Volume</div>
+            </div>
+          </div>
+        </p-card>
+        <p-card>
+          <div class="stat-card">
+            <i class="pi pi-list stat-card__icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-card__value">{{ t.statistics.totalSets }}</div>
+              <div class="stat-card__label">Total Sets</div>
+            </div>
+          </div>
+        </p-card>
+        <p-card>
+          <div class="stat-card">
+            <i class="pi pi-refresh stat-card__icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-card__value">{{ t.statistics.totalReps }}</div>
+              <div class="stat-card__label">Total Reps</div>
+            </div>
+          </div>
+        </p-card>
+        @if (t.statistics.estimatedCalories !== null) {
+          <p-card>
+            <div class="stat-card">
+              <i class="pi pi-bolt stat-card__icon" aria-hidden="true"></i>
+              <div>
+                <div class="stat-card__value">{{ t.statistics.estimatedCalories }}</div>
+                <div class="stat-card__label">Est. Calories</div>
+              </div>
+            </div>
+          </p-card>
+        }
+      </section>
+
+      @if (t.notes) {
+        <p-card styleClass="notes-card">
+          <div class="notes-section">
+            <i class="pi pi-align-left" aria-hidden="true"></i>
+            <p>{{ t.notes }}</p>
+          </div>
+        </p-card>
+      }
+
+      <!-- Exercises -->
+      <section class="exercises-section" aria-label="Exercises">
+        <h2 class="section-title">Exercises</h2>
+        @if (t.exercises.length === 0) {
+          <p class="no-exercises">No exercises recorded for this session.</p>
+        } @else {
+          <div class="exercises-list">
+            @for (exercise of t.exercises; track exercise.id) {
+              <p-card styleClass="exercise-card">
+                <div class="exercise-header">
+                  <span class="exercise-name">{{ exercise.exerciseName }}</span>
+                  <span class="exercise-set-count" aria-label="{{ exercise.sets.length }} sets">
+                    {{ exercise.sets.length }} set{{ exercise.sets.length !== 1 ? 's' : '' }}
+                  </span>
+                </div>
+                <table class="sets-table" aria-label="Sets for {{ exercise.exerciseName }}">
+                  <thead>
+                    <tr>
+                      <th scope="col">Set</th>
+                      <th scope="col">Performance</th>
+                      <th scope="col">Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (set of exercise.sets; track set.id) {
+                      <tr>
+                        <td>{{ set.setNumber }}</td>
+                        <td>{{ formatSet(set) }}</td>
+                        <td class="set-notes">{{ set.notes || '—' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </p-card>
+            }
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>

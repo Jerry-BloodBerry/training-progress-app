@@ -1,12 +1,23 @@
 using Core;
+using Core.Persistence;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCoreServices(builder.Configuration);
 builder.Services.AddFastEndpoints();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("LocalDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -28,12 +39,20 @@ builder.Services.SwaggerDocument(o =>
 
 var app = builder.Build();
 
+if (string.Equals(Environment.GetEnvironmentVariable("ENABLE_MIGRATIONS"), "true", StringComparison.OrdinalIgnoreCase))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
+
+app.UseCors("LocalDev");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints();
 app.UseSwaggerGen();
 
-app.Run();
+await app.RunAsync();
 
 // Make Program visible to the Tests project for WebApplicationFactory
 public partial class Program { }

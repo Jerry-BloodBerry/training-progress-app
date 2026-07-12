@@ -1,9 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { signal, computed } from '@angular/core';
+import { of } from 'rxjs';
 import { ClerkService } from 'ngx-clerk';
 import { DashboardComponent, CalendarDate } from './dashboard.component';
 import { DashboardService, BodyMassChartData } from './dashboard.service';
+import { TrainingService } from '../trainings/training.service';
+import { ListTrainingsResponse } from '../trainings/training.model';
 
 class MockClerkService {
   isLoaded = signal(true);
@@ -14,6 +17,13 @@ class MockClerkService {
     username: null,
   });
   signOut = jasmine.createSpy('signOut').and.returnValue(Promise.resolve());
+}
+
+class MockTrainingService {
+  knownExerciseNames = signal<string[]>([]);
+  list = jasmine.createSpy('list').and.returnValue(
+    of<ListTrainingsResponse>({ items: [], totalCount: 0, page: 1, pageSize: 3 }),
+  );
 }
 
 class MockDashboardService {
@@ -64,6 +74,7 @@ describe('DashboardComponent', () => {
         provideRouter([]),
         { provide: ClerkService, useClass: MockClerkService },
         { provide: DashboardService, useValue: mockDashboardService },
+        { provide: TrainingService, useClass: MockTrainingService },
       ],
     }).compileComponents();
   });

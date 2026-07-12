@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ChartModule } from 'primeng/chart';
 import { DashboardService, BodyMassPeriodMonths } from './dashboard.service';
+import { RecentTrainingsComponent } from './recent-trainings.component';
 
 export interface PeriodOption {
   label: string;
@@ -24,7 +25,7 @@ export interface CalendarDate {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, CardModule, ButtonModule, DatePickerModule, ChartModule],
+  imports: [RouterLink, DecimalPipe, CardModule, ButtonModule, DatePickerModule, ChartModule, RecentTrainingsComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

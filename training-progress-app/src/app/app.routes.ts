@@ -10,4 +10,30 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
+  {
+    path: 'trainings',
+    canActivate: [canActivateClerk],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./trainings/trainings.component').then((m) => m.TrainingsComponent),
+      },
+      {
+        path: 'new',
+        loadComponent: () =>
+          import('./trainings/training-form.component').then((m) => m.TrainingFormComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./trainings/training-detail.component').then((m) => m.TrainingDetailComponent),
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () =>
+          import('./trainings/training-form.component').then((m) => m.TrainingFormComponent),
+      },
+    ],
+  },
 ];

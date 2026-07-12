@@ -1,0 +1,261 @@
+<div class="form-page">
+  <p-toast />
+
+  <header class="page-header">
+    <div class="page-header__inner">
+      <div class="page-header__title-group">
+        <a routerLink="/trainings" class="page-header__back" aria-label="Back to trainings">
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        </a>
+        <h1 class="page-header__title">
+          {{ isEditMode() ? 'Edit Training' : 'New Training' }}
+        </h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content" id="main-content" tabindex="-1">
+    @if (loading()) {
+      <div class="loading-state" aria-busy="true" aria-label="Loading training data">
+        <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+        <span>Loading training&hellip;</span>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <p-stepper [(value)]="activeStep" [linear]="true">
+          <p-step-list>
+            <p-step [value]="1">Training Details</p-step>
+            <p-step [value]="2">Exercises</p-step>
+          </p-step-list>
+
+          <p-step-panels>
+            <!-- ── Step 1: Training details ───────────────────────────── -->
+            <p-step-panel [value]="1">
+              <ng-template #content let-activateCallback="activateCallback">
+                <div class="step-body">
+                  <div class="form-grid">
+                    <!-- Date -->
+                    <div class="form-field">
+                      <label for="training-date" class="form-label">
+                        Date <span class="required" aria-hidden="true">*</span>
+                      </label>
+                      <p-datepicker
+                        inputId="training-date"
+                        formControlName="date"
+                        [maxDate]="today"
+                        [showIcon]="true"
+                        dateFormat="dd/mm/yy"
+                        placeholder="Select date"
+                        styleClass="w-full"
+                        aria-required="true"
+                      />
+                      @if (form.get('date')?.invalid && form.get('date')?.touched) {
+                        <small class="form-error" role="alert">Date is required.</small>
+                      }
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="form-field">
+                      <label for="training-duration" class="form-label">
+                        Duration (minutes) <span class="required" aria-hidden="true">*</span>
+                      </label>
+                      <p-inputnumber
+                        inputId="training-duration"
+                        formControlName="durationMinutes"
+                        [min]="1"
+                        [max]="600"
+                        suffix=" min"
+                        styleClass="w-full"
+                        aria-required="true"
+                      />
+                      @if (form.get('durationMinutes')?.invalid && form.get('durationMinutes')?.touched) {
+                        <small class="form-error" role="alert">Duration must be at least 1 minute.</small>
+                      }
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-field form-field--full">
+                      <label for="training-notes" class="form-label">Notes (optional)</label>
+                      <textarea
+                        pTextarea
+                        id="training-notes"
+                        formControlName="notes"
+                        rows="3"
+                        placeholder="Any notes about this session&hellip;"
+                        class="w-full"
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <div class="step-footer">
+                    <p-button
+                      label="Next: Add Exercises"
+                      icon="pi pi-arrow-right"
+                      iconPos="right"
+                      type="button"
+                      (onClick)="goToStep2(activateCallback)"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+            </p-step-panel>
+
+            <!-- ── Step 2: Exercises ──────────────────────────────────── -->
+            <p-step-panel [value]="2">
+              <ng-template #content let-activateCallback="activateCallback">
+                <div class="step-body">
+                  <div class="exercises-builder" formArrayName="exercises">
+                    @for (exercise of exercises.controls; track $index; let ei = $index) {
+                      <div class="exercise-card" [formGroupName]="ei">
+                        <div class="exercise-card__header">
+                          <div class="exercise-name-field">
+                            <label [for]="'exercise-name-' + ei" class="sr-only">
+                              Exercise name
+                            </label>
+                            <p-autocomplete
+                              [inputId]="'exercise-name-' + ei"
+                              formControlName="exerciseName"
+                              [suggestions]="filteredExercises()"
+                              (completeMethod)="filterExercises($event)"
+                              [dropdown]="true"
+                              [forceSelection]="false"
+                              placeholder="Exercise name (e.g. Bench Press)"
+                              styleClass="exercise-autocomplete"
+                              aria-required="true"
+                            />
+                            @if (
+                              getControl(exercise, 'exerciseName').invalid &&
+                              getControl(exercise, 'exerciseName').touched
+                            ) {
+                              <small class="form-error" role="alert">Exercise name is required.</small>
+                            }
+                          </div>
+                          @if (exercises.length > 1) {
+                            <p-button
+                              icon="pi pi-times"
+                              [rounded]="true"
+                              [text]="true"
+                              severity="danger"
+                              size="small"
+                              type="button"
+                              (onClick)="removeExercise(ei)"
+                              [ariaLabel]="'Remove exercise ' + (ei + 1)"
+                            />
+                          }
+                        </div>
+
+                        <!-- Sets -->
+                        <div class="sets-builder" formArrayName="sets">
+                          @for (set of setsFor(ei).controls; track $index; let si = $index) {
+                            <div class="set-row" [formGroupName]="si">
+                              <span class="set-number" aria-hidden="true">{{ si + 1 }}</span>
+                              <div class="set-fields">
+                                <div class="set-field">
+                                  <label [for]="'reps-' + ei + '-' + si" class="set-label">Reps</label>
+                                  <p-inputnumber
+                                    [inputId]="'reps-' + ei + '-' + si"
+                                    formControlName="reps"
+                                    [min]="0"
+                                    [max]="9999"
+                                    placeholder="—"
+                                    [inputStyle]="{ width: '5rem' }"
+                                  />
+                                </div>
+                                <div class="set-field">
+                                  <label [for]="'weight-' + ei + '-' + si" class="set-label">Weight (kg)</label>
+                                  <p-inputnumber
+                                    [inputId]="'weight-' + ei + '-' + si"
+                                    formControlName="weightKg"
+                                    [min]="0"
+                                    [minFractionDigits]="0"
+                                    [maxFractionDigits]="2"
+                                    placeholder="—"
+                                    [inputStyle]="{ width: '6rem' }"
+                                  />
+                                </div>
+                                <div class="set-field">
+                                  <label [for]="'duration-' + ei + '-' + si" class="set-label">Duration (s)</label>
+                                  <p-inputnumber
+                                    [inputId]="'duration-' + ei + '-' + si"
+                                    formControlName="durationSeconds"
+                                    [min]="0"
+                                    [max]="99999"
+                                    placeholder="—"
+                                    [inputStyle]="{ width: '5.5rem' }"
+                                  />
+                                </div>
+                                <div class="set-field set-field--notes">
+                                  <label [for]="'set-notes-' + ei + '-' + si" class="set-label">
+                                    Notes
+                                  </label>
+                                  <input
+                                    pInputText
+                                    [id]="'set-notes-' + ei + '-' + si"
+                                    formControlName="setNotes"
+                                    placeholder="Optional"
+                                  />
+                                </div>
+                              </div>
+                              @if (setsFor(ei).length > 1) {
+                                <p-button
+                                  icon="pi pi-minus"
+                                  [rounded]="true"
+                                  [text]="true"
+                                  severity="secondary"
+                                  size="small"
+                                  type="button"
+                                  (onClick)="removeSet(ei, si)"
+                                  [ariaLabel]="'Remove set ' + (si + 1)"
+                                />
+                              }
+                            </div>
+                          }
+                        </div>
+
+                        <p-button
+                          label="Add Set"
+                          icon="pi pi-plus"
+                          [text]="true"
+                          size="small"
+                          type="button"
+                          (onClick)="addSet(ei)"
+                          styleClass="add-set-btn"
+                        />
+                      </div>
+                    }
+
+                    <p-button
+                      label="Add Exercise"
+                      icon="pi pi-plus"
+                      [outlined]="true"
+                      type="button"
+                      (onClick)="addExercise()"
+                      styleClass="add-exercise-btn"
+                    />
+                  </div>
+
+                  <div class="step-footer step-footer--split">
+                    <p-button
+                      label="Back"
+                      icon="pi pi-arrow-left"
+                      [outlined]="true"
+                      type="button"
+                      (onClick)="activateCallback(1)"
+                    />
+                    <p-button
+                      [label]="isEditMode() ? 'Update Training' : 'Save Training'"
+                      icon="pi pi-check"
+                      type="submit"
+                      [loading]="submitting()"
+                      [disabled]="submitting()"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+            </p-step-panel>
+          </p-step-panels>
+        </p-stepper>
+      </form>
+    }
+  </main>
+</div>

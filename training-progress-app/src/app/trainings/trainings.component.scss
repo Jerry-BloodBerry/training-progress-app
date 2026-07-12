@@ -1,0 +1,110 @@
+.trainings-page {
+  min-height: 100vh;
+  background-color: var(--p-surface-900);
+  color: var(--p-surface-0);
+}
+
+.page-header {
+  background-color: var(--p-surface-800);
+  border-bottom: 1px solid var(--p-surface-700);
+  padding: 1rem 1.5rem;
+
+  &__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__back {
+    color: var(--p-surface-400);
+    font-size: 1.125rem;
+    transition: color 0.15s;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--p-primary-400);
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.page-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  &__icon {
+    font-size: 3rem;
+    color: var(--p-surface-500);
+  }
+
+  &__message {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  &__hint {
+    color: var(--p-surface-400);
+    margin: 0;
+  }
+}
+
+.training-date-link {
+  color: var(--p-primary-400);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.col-notes {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--p-surface-400);
+  font-style: italic;
+}
+
+.col-actions {
+  width: 6rem;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.25rem;
+}

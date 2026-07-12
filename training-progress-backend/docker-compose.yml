@@ -23,7 +23,9 @@ services:
       dockerfile: API/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      ENABLE_MIGRATIONS: "true"
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      Clerk__Authority: ${CLERK_AUTHORITY}
       Clerk__SecretKey: ${CLERK_SECRET_KEY}
       Clerk__PublishableKey: ${CLERK_PUBLISHABLE_KEY}
     ports:

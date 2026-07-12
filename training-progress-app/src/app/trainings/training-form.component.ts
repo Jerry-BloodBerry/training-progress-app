@@ -174,11 +174,14 @@ export class TrainingFormComponent {
 
   protected addSet(exerciseIndex: number): void {
     const setsArr = this.setsFor(exerciseIndex);
-    const lastValue =
-      setsArr.length > 0 ? (setsArr.at(setsArr.length - 1).value as SetFormValue) : undefined;
+    const last = setsArr.length > 0 ? setsArr.at(setsArr.length - 1) : null;
     // Pre-fill numeric fields from the previous set; skip notes (they are set-specific)
-    const prefill: Partial<SetFormValue> | undefined = lastValue
-      ? { reps: lastValue.reps, weightKg: lastValue.weightKg, durationSeconds: lastValue.durationSeconds }
+    const prefill: Partial<SetFormValue> | undefined = last
+      ? {
+          reps: last.get('reps')?.value as number | null,
+          weightKg: last.get('weightKg')?.value as number | null,
+          durationSeconds: last.get('durationSeconds')?.value as number | null,
+        }
       : undefined;
     setsArr.push(this.createSetGroup(prefill));
   }
@@ -196,21 +199,27 @@ export class TrainingFormComponent {
   }
 
   protected exerciseSummary(exerciseIndex: number): string {
-    const sets = this.setsFor(exerciseIndex).value as SetFormValue[];
-    const count = sets.length;
-    const totalReps = sets.reduce((sum, s) => sum + (s.reps ?? 0), 0);
-    const weights = sets
-      .map((s) => s.weightKg)
-      .filter((w): w is number => w !== null && w > 0);
+    const setsArr = this.setsFor(exerciseIndex);
+    const count = setsArr.length;
+    let totalReps = 0;
+    const weights: number[] = [];
 
-    const parts: string[] = [`${count} set${count !== 1 ? 's' : ''}`];
-    if (totalReps > 0) parts.push(`${totalReps} reps`);
+    for (let i = 0; i < count; i++) {
+      const set = setsArr.at(i);
+      const reps = set.get('reps')?.value as number | null;
+      const weightKg = set.get('weightKg')?.value as number | null;
+      if (reps != null && reps > 0) totalReps += reps;
+      if (weightKg != null && weightKg > 0) weights.push(weightKg);
+    }
+
+    const summaryParts: string[] = [`${count} set${count !== 1 ? 's' : ''}`];
+    if (totalReps > 0) summaryParts.push(`${totalReps} reps`);
     if (weights.length > 0) {
       const min = Math.min(...weights);
       const max = Math.max(...weights);
-      parts.push(min === max ? `${min} kg` : `${min}–${max} kg`);
+      summaryParts.push(min === max ? `${min} kg` : `${min}–${max} kg`);
     }
-    return parts.join(' · ');
+    return summaryParts.join(' · ');
   }
 
   protected getControl(group: AbstractControl, name: string): AbstractControl {
